@@ -81,3 +81,29 @@ JOIN (
     WHERE indicator = 'Total persons all ages'
 ) p ON d.year = p.year
 ORDER BY d.year;
+/*Disease Prevalance view*/
+CREATE VIEW disease_prevalence AS
+SELECT 
+    h1.indicator,
+    h1.year,
+    h1.value,
+    ROUND(h1.value / h2.value * 100, 2) AS prevalence_percentage
+FROM health_metrics h1
+JOIN (
+    SELECT year, MAX(value) as value
+    FROM health_metrics 
+    WHERE indicator = 'Total persons all ages'
+    GROUP BY year
+) h2 ON h1.year = h2.year
+WHERE h1.category IN ('Chronic Disease', 'Serious Condition');
+/*Yearly Health Summary view*/
+CREATE VIEW yearly_health_summary AS
+SELECT 
+    year,
+    MAX(CASE WHEN indicator = 'Excellent / Very good' THEN value END) AS excellent_health,
+    MAX(CASE WHEN indicator = 'Fair / Poor' THEN value END) AS poor_health,
+    MAX(CASE WHEN indicator = 'Current daily smoker' THEN value END) AS smokers,
+    MAX(CASE WHEN indicator = 'Total Overweight / Obese' THEN value END) AS overweight_obese
+FROM health_metrics
+GROUP BY year;
+
