@@ -1,0 +1,50 @@
+import pandas as pd
+import numpy as np
+
+def process_health_data(file_path):
+    # Load data while skipping bad headers
+    df = pd.read_excel(file_path, sheet_name='Sheet1', header=None)
+    
+    # Identify the real header row (look for years)
+    for i, row in df.iterrows():
+        if any(isinstance(x, (int, float)) and 2000 < x < 2100 for x in row[1:] if pd.notna(x)):
+            header_row = i
+            break
+    
+    # Reload with correct headers
+    df = pd.read_excel(file_path, sheet_name='Sheet1', header=header_row)
+    
+    # Clean column names
+    df = df.rename(columns={df.columns[0]: 'indicator'})
+    df.columns = ['indicator'] + [int(x) if isinstance(x, (int, float)) and 2000 < x < 2100 else x 
+                                for x in df.columns[1:]]
+    
+    # Melt to long format
+    long_df = df.melt(
+        id_vars=['indicator'],
+        var_name='year',
+        value_name='value'
+    ).dropna(subset=['value'])
+    
+    # Clean year column (skip non-year values)
+    long_df = long_df[long_df['year'].apply(lambda x: isinstance(x, (int, float)) and 2000 < x < 2100)]
+    long_df['year'] = long_df['year'].astype(int)
+    
+    # Clean indicator names
+    long_df['indicator'] = (
+        long_df['indicator']
+        .str.strip()
+        .str.replace(r'[^a-zA-Z0-9\s/]', '', regex=True)
+    )
+    
+    # Save cleaned data
+    output_path = file_path.replace('.xlsx', '_CLEANED.csv')
+    long_df.to_csv(output_path, index=False)
+    
+    print(f"Data saved to {output_path}")
+    print("\nSample output:")
+    print(long_df.head())
+    return long_df
+
+# Run
+cleaned_data = process_health_data(r'C:\Users\fardi\Downloads\australian_bureau_final.xlsx')
