@@ -4,10 +4,10 @@ About Data:The national health survey  data was collected from Australian Bureau
 It also contains self asssessed health status and health risk factor data
 
 ## Project Description
-Overview
+### Overview
 This project analyzes long-term trends in health indicators using data from the Australian Bureau of Statistics. The focus is on understanding the rise and prevalence of chronic diseases and behavioral health risk factors across a 21-year period. It combines data cleaning, SQL-based trend analysis, and categorical classification to extract meaningful public health insights.
 
-##Tools & Technologies
+### Tools & Technologies
 SQL (MySQL): Data loading, transformation, and trend analysis
 
 Python (Pandas, NumPy): Data preprocessing and reshaping
@@ -15,7 +15,7 @@ Python (Pandas, NumPy): Data preprocessing and reshaping
 Excel: Initial raw data source
 
 Data Source: Australian Bureau of Statistics
-##Data Cleaning (Python):
+### Data Cleaning (Python):
 
 Loaded an Excel file with inconsistent headers
 
@@ -33,7 +33,7 @@ Loaded cleaned CSV data using LOAD DATA INFILE.
 
 Auto-categorized health indicators into groups: Chronic Disease, Serious Condition, Mental Health, Behavioral, Nutrition, Biometrics, and Physical Activity
 
-##Trend Analysis:
+### Trend Analysis:
 
 Identified top 5 diseases with the highest percentage growth from 2001 to 2022
 
