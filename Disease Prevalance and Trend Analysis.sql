@@ -107,3 +107,51 @@ SELECT
 FROM health_metrics
 GROUP BY year;
 
+/*Top 5 most prevalent diseases by year*/
+SELECT *
+FROM disease_prevalence
+WHERE year = 2022
+ORDER BY prevalence_percentage DESC
+LIMIT 5;
+
+/*Compare obesity vs smoking in a given year*/
+SELECT year, 
+    MAX(CASE WHEN indicator = 'Current daily smoker' THEN value END) AS smokers,
+    MAX(CASE WHEN indicator = 'Total Overweight / Obese' THEN value END) AS overweight
+FROM health_metrics
+GROUP BY year
+ORDER BY year;
+
+/*Correlation Between Chronic Disease and Behavioral Risk Values*/
+SELECT 
+    d.year,
+    d.value AS chronic_disease_total,
+    b.value AS behavioral_total
+FROM (
+    SELECT year, SUM(value) AS value
+    FROM health_metrics
+    WHERE category = 'Chronic Disease'
+    GROUP BY year
+) d
+JOIN (
+    SELECT year, SUM(value) AS value
+    FROM health_metrics
+    WHERE category = 'Behavioral'
+    GROUP BY year
+) b ON d.year = b.year
+ORDER BY d.year;
+
+
+SELECT 
+    h.year,
+    h.value AS diabetes_rate,
+    y.smokers,
+    y.overweight_obese,
+    s.seifa_score -- Assuming you have a SEIFA table
+FROM health_metrics h
+JOIN yearly_health_summary y ON h.year = y.year
+LEFT JOIN seifa_data s ON h.year = s.year -- Example join
+WHERE h.indicator = 'Diabetes mellitus'
+INTO OUTFILE '/tmp/diabetes_ml.csv'
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n';
+
